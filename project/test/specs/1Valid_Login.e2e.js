@@ -1,46 +1,29 @@
-import { browser } from '@wdio/globals'
-import LoginPage from '../pageobjects/login.page.js'
+import loginPage from '../pageobjects/login.page.js'
 import { expect } from 'expect-webdriverio'
+import { URLS } from '../pageobjects/constants.js'
 
 describe('User on the login page', () => {
-
     beforeEach(async () => {     
-        await LoginPage.open()
+        await loginPage.open()
     })
-
     it('Data is entered to the Login field.', async () => {
-
-        await LoginPage.inputUsername.setValue('standard_user')
-
-        const entered = await LoginPage.inputUsername.getValue()
+        await loginPage.enterUsername('standard_user')
+        const entered = await loginPage.inputUsername.getValue()
         await expect(entered).toBe('standard_user')
-    }
-    )
-
+    })
     it('Data is entered to the password field and represented as dots.', async () => {
-        
-        await LoginPage.inputPassword.setValue('secret_sauce')
-
-        const input = await LoginPage.inputPassword
-        await expect(input).toHaveAttribute('type', 'password')
+        await loginPage.enterPassword('secret_sauce')
+        await expect(loginPage.inputPassword).toHaveAttribute('type', 'password')
     })
-
     it('Should login with valid credentials.', async () => {
-
-        await LoginPage.login('standard_user', 'secret_sauce')
-
+        await loginPage.login('standard_user', 'secret_sauce')
         const currentUrl = await browser.getUrl()
-        await expect(currentUrl).toContain('inventory.html')
+        await expect(currentUrl).toContain(URLS.INVENTORY_PAGE)
     })
-    
     it('User redirected to the inventory page.', async () => {
-
-        await LoginPage.login('standard_user', 'secret_sauce')
-        const title = await $('.title')
-        await expect(title).toBeDisplayed()
-        await expect(title).toHaveText('Products')
-
-        const cart = await $('.shopping_cart_link')
-        await expect(cart).toBeDisplayed()
+        await loginPage.login('standard_user', 'secret_sauce')
+        await expect(loginPage.pageTitle).toBeDisplayed()
+        await expect(loginPage.pageTitle).toHaveText('Products')
+        await expect(loginPage.cartLink).toBeDisplayed()
     })
 })

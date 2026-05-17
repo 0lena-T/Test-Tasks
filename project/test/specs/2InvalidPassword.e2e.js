@@ -1,57 +1,33 @@
-import { browser } from '@wdio/globals'
-import LoginPage from '../pageobjects/login.page.js'
+import loginPage from '../pageobjects/login.page.js'
 import { expect } from 'expect-webdriverio'
+import { ERROR_MESSAGES } from '../pageobjects/constants.js'
 
-describe('Login with invalid password', () => {
-    
+describe('Login with invalid password', () => { 
     beforeEach(async () => {     
-        await LoginPage.open()
-        await LoginPage.login('standard_user', 'non_sauce')
+        await loginPage.open()
     })
-
     it('Data is entered to the Login field.', async () => {
-
-        await LoginPage.open()
-        await LoginPage.inputUsername.setValue('standard_user')
-
-        const entered = await LoginPage.inputUsername.getValue()
+        await loginPage.enterUsername('standard_user')
+        const entered = await loginPage.inputUsername.getValue()
         await expect(entered).toBe('standard_user')
     })
-
-    it('Should login with invalid credentials.', async () => {
-
-        const errorMessage = await LoginPage.errorMessage.getText()
-        await expect(errorMessage).toContain('Epic sadface: Username and password do not match any user in this service')
-    })
-
     it('Data is entered to the field and represented as dots', async () => {
-
-        await LoginPage.open()
-        await LoginPage.inputPassword.setValue('non_sauce')
-
-        const input = await LoginPage.inputPassword
-        await expect(input).toHaveAttribute('type', 'password')
+        await loginPage.enterPassword('non_sauce')
+        await expect(loginPage.inputPassword).toHaveAttribute('type', 'password')
     })
-
-    it('check x icons', async () => {
-        
-        const icons = await LoginPage.errorIcons
-        
-        if (icons.length !== 2) {
-
-        throw new Error(`must be 2 icons, but find: ${icons.length}`)
-        }})
-
+    it('Should login with invalid credentials.', async () => {
+        await loginPage.login('standard_user', 'non_sauce')
+        const errorMessage = await loginPage.getErrorMessage()
+        await expect(errorMessage).toContain(ERROR_MESSAGES.INVALID_CREDENTIALS_ERROR)
+    })
+    it('check x icons', async () => {  
+        await loginPage.login('standard_user', 'non_sauce') 
+        const iconsCount = await loginPage.getErrorIconsCount()
+        await expect(iconsCount).toBe(2)
+        })
     it('check red fields', async () => {
-
-       const usernameClass = await LoginPage.inputUsername.getAttribute('class')
-
-       if (!usernameClass.includes('input_error')) {
-        throw new Error('Login field not red.')
-       }
-       const passwordClass = await LoginPage.inputPassword.getAttribute('class')
-
-       if(!passwordClass.includes('input_error')) {
-        throw new Error('Password field not red.')
-       }})
+        await loginPage.login('standard_user', 'non_sauce')
+        const fieldsRed = await loginPage.areFieldsRed()
+        await expect(fieldsRed).toBe(true)
+    })
 })

@@ -1,4 +1,3 @@
-import { $, $$ } from '@wdio/globals'
 import Page from './page.js'
 import loginPage from './login.page.js'
 class InventoryPage extends Page {

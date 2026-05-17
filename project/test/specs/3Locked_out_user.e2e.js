@@ -1,59 +1,33 @@
-import { browser } from '@wdio/globals'
-import LoginPage from '../pageobjects/login.page.js'
+import loginPage from '../pageobjects/login.page.js'
 import { expect } from 'expect-webdriverio'
+import { ERROR_MESSAGES } from '../pageobjects/constants.js'
 
 describe('Login with locked out test login.', () => {
-
     beforeEach(async () => {     
-        await LoginPage.open()
+        await loginPage.open()
     })
-
     it('Data is entered to the Login field.', async () => {
-
-        await LoginPage.inputUsername.setValue('locked_out_user')
-
-        const entered = await LoginPage.inputUsername.getValue()
+        await loginPage.enterUsername('locked_out_user')
+        const entered = await loginPage.inputUsername.getValue()
         await expect(entered).toBe('locked_out_user')
-    }
-    )
-
+    })
     it('Data is entered to the field and represented as dots', async () => {
-
-        await LoginPage.inputPassword.setValue('secret_sauce')
-
-        const input = await LoginPage.inputPassword
-        await expect(input).toHaveAttribute('type', 'password')
+        await loginPage.enterPassword('secret_sauce')
+        await expect(loginPage.inputPassword).toHaveAttribute('type', 'password')
     })
-
     it('Should show error for locked out user.', async () => {
-
-        await LoginPage.login('locked_out_user', 'secret_sauce')
-
-        const errorMessage = await LoginPage.errorMessage.getText()
-        await expect(errorMessage).toContain('Epic sadface: Sorry, this user has been locked out.')
+        await loginPage.login('locked_out_user', 'secret_sauce')
+        const errorMessage = await loginPage.getErrorMessage()
+        await expect(errorMessage).toContain(ERROR_MESSAGES.LOCKED_OUT_USER_ERROR)
     })
-
     it('check x icons', async () => {
-        
-        await LoginPage.login('locked_out_user', 'secret_sauce')
-
-        const icons = await LoginPage.errorIcons
-        if (icons.length !== 2) {
-        throw new Error(`must be 2 icons, but find: ${icons.length}`)
-        }
+        await loginPage.login('locked_out_user', 'secret_sauce')
+        const iconsCount = await loginPage.getErrorIconsCount()
+        await expect(iconsCount).toBe(2)
     })
-    
     it('Check red fields.', async () => {
-
-        await LoginPage.login('locked_out_user', 'secret_sauce')
-
-       const usernameClass = await LoginPage.inputUsername.getAttribute('class')
-       if (!usernameClass.includes('input_error')) {
-        throw new Error('Login field not red.')}
-
-       const passwordClass = await LoginPage.inputPassword.getAttribute('class')
-       if(!passwordClass.includes('input_error')) {
-        throw new Error('Password field not red.')
-       }})
+        await loginPage.login('locked_out_user', 'secret_sauce')
+        const fieldsRed = await loginPage.areFieldsRed()
+        await expect(fieldsRed).toBe(true)
+    })
 })
-
