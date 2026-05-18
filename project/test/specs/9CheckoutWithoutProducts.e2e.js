@@ -1,25 +1,19 @@
 import inventoryPage from '../pageobjects/inventory.page'
-import { expect } from 'expect-webdriverio'
 import checkoutPage from '../pageobjects/checkout.page'
+import { ERROR_MESSAGES, URLS } from '../pageobjects/constants'
 
 describe('Valid checkout.', () => {
     it('Cart page is displayed, products are not displayed', async () => {
         await inventoryPage.open()
-        await inventoryPage.cartLink.click()
+        await inventoryPage.clickCartLink()
         const currentUrl = await browser.getUrl()
-        await expect(currentUrl).toContain('cart.html')
-        const cartItems = await $$('.cart_item')
-            if (cartItems.length !== 0) {
-                throw new Error(`Cart must be empty,but found item: ${cartItems.length} `)
-            }
+        await expect(currentUrl).toContain(URLS.CART_PAGE)
+        await checkoutPage.verifyCartIsEmpty()
     })
     it('Error message "Cart is empty" is displayed', async () => {
-        await checkoutPage.checkoutBtn.click()
+        await checkoutPage.clickCheckoutBtn()
         const currentUrl = await browser.getUrl()
-        if (!currentUrl.includes('cart.html')) {
-            throw new Error(`Error. Redirect occurred, current URL: ${currentUrl}`);
-        }
-        const errorMessage = await $('.error_message').getText()
-        await expect(errorMessage).toContain('Cart is empty')
+        await expect(currentUrl).toContain(URLS.CART_PAGE)
+        await checkoutPage.verifyCartErrorMessage(ERROR_MESSAGES.CART_IS_EMPTY)
     })
 })

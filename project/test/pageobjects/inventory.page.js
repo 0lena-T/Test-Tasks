@@ -49,6 +49,18 @@ class InventoryPage extends Page {
     get cartItemName () {
         return $('.cart_item .inventory_item_name')
     }
+    async clickCartLink() {
+        await this.cartLink.click()
+    }
+    async addToCartBackpackClick() {
+        await this.addToCartBackpack.click()
+    }
+    async getBackpackPriceText() {
+        return await this.backpackPrice.getText()
+    }
+    async getBackpackNameText() {
+        return await this.backpackName.getText()
+    }
     async openSortMenu() {
         await this.sortBtn.click()
     }
