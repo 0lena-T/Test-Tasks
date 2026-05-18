@@ -10,6 +10,7 @@ export const ERROR_MESSAGES = {
     LOCKED_OUT_USER_ERROR: 'Epic sadface: Sorry, this user has been locked out.',
     INVALID_CREDENTIALS_ERROR: 'Epic sadface: Username and password do not match any user in this service',
     CART_IS_EMPTY_ERROR: 'Cart is empty',
+    SORTING_ERROR: 'Sorting is broken'
 }
 export const SUCCESS_MESSAGES = {
     CHECKOUT_COMPLETE: 'Thank you for your order!'

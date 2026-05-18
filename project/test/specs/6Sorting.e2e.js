@@ -1,37 +1,25 @@
 import inventoryPage from '../pageobjects/inventory.page'
-import { expect } from 'expect-webdriverio'
+import { ERROR_MESSAGES } from '../pageobjects/constants'
 
 describe('Sorting products.', () => {
     it('Products was sorted due chosen sorting.', async () => {
         await inventoryPage.open()
-        await inventoryPage.sortBtn.click()
+        await inventoryPage.openSortMenu()
+    // A-Z
         await inventoryPage.selectSortType('A-Z')
-        const namesAZ = await inventoryPage.getAllProdNames()
-            for (let i = 0; i < namesAZ.length - 1; i++) {
-                if (namesAZ[i] > namesAZ[i+1]) {
-                throw new Error(`A-Z broken: ${namesAZ[i]} comes before ${namesAZ[i+1]}`)
-            }
-        }
+        const namesAZ = await inventoryPage.sortedNames('A-Z')
+            if (!namesAZ) throw new Error(`${ERROR_MESSAGES.SORTING_ERROR}: A-Z`)
+    // Z-A
         await inventoryPage.selectSortType('Z-A')
-        const namesZA = await inventoryPage.getAllProdNames()
-            for (let i = 0; i < namesZA.length - 1; i++) {
-                if ( namesZA[i] < namesZA[i+1]) {
-                    throw new Error(`Z-A broken: ${namesZA[i]} comes after ${namesZA[i+1]}`)
-            }
-        }
+        const namesZA = await inventoryPage.sortedNames('Z-A')
+            if (!namesZA) throw new Error(`${ERROR_MESSAGES.SORTING_ERROR}: Z-A`)
+    // Low-High
         await inventoryPage.selectSortType('Low-High')
-        const pricesLH = await inventoryPage.getAllProdPrices()
-            for (let i = 0; i < pricesLH.length - 1; i++) {
-                if (pricesLH[i] > pricesLH[i+1]) {
-                throw new Error(`Low-High broken: ${pricesLH[i]} comes before ${pricesLH[i+1]}`)
-            }
-        }
+        const pricesLH = await inventoryPage.sortedPrices('Low-High')
+            if (!pricesLH) throw new Error(`${ERROR_MESSAGES.SORTING_ERROR}: Low-High`)
+    // High-Low
         await inventoryPage.selectSortType('High-Low')
-        const pricesHL = await inventoryPage.getAllProdPrices()
-            for (let i = 0; i < pricesHL.length - 1; i++) {
-                if ( pricesHL[i] < pricesHL[i+1]) {
-                    throw new Error(`High-Low broken: ${pricesHL[i]} comes after ${pricesHL[i+1]}`)
-            }
-        }
+        const pricesHL = await inventoryPage.sortedPrices('High-Low')
+            if (!pricesHL) throw new Error(`${ERROR_MESSAGES.SORTING_ERROR}: High-Low`)
     })
 })

@@ -1,6 +1,7 @@
 import inventoryPage from '../pageobjects/inventory.page'
 import { expect } from 'expect-webdriverio'
 import loginPage from '../pageobjects/login.page'
+import { URLS } from '../pageobjects/constants'
 
 describe('Saving the cart after logout .', () => {
     let savedName = ''
@@ -12,33 +13,26 @@ describe('Saving the cart after logout .', () => {
     })
     it('Menu is expanded, 4 items are displayed.', async () => {
         await inventoryPage.burgerBtn.click()
-        await expect (inventoryPage.sidebar).toHaveAttribute('aria-hidden', 'false')
-        const menuItems = await $$('.bm-item.menu-item')
-        if (menuItems.length !== 4) {
-            throw new Error(`must be 4 items, but find: ${menuItems.length}`)
-        }
+        await expect(inventoryPage.sidebar).toHaveAttribute('aria-hidden', 'false')
+        const menuItemsCount = await inventoryPage.getMenuItemsCount()
+        await expect(menuItemsCount).toBe(4)
     })
     it('User are redirecred to the "Login" page, "Username" and "Password" field are empty', async () => {
         await inventoryPage.logoutBtn.click()
-        await expect(browser).toHaveUrl('https://www.saucedemo.com/')
-        const userValue = await $('#user-name').getValue()
-        const passwordValue = await $('#password').getValue()
-            if (userValue !== '' || passwordValue !== '') {
-            throw new Error('Login and Password field is not empty.')}
+        await expect(browser).toHaveUrl(URLS.BASE_URL)
+        await expect(loginPage.inputUsername).toHaveValue('')
+        await expect(loginPage.inputPassword).toHaveValue('')
     })
     it('User redirected to the inventory page.Products and cart are displayed', async () => {
         await loginPage.login('standard_user','secret_sauce')
         const currentUrl = await browser.getUrl()
-        await expect(currentUrl).toContain('inventory.html')
+        await expect(currentUrl).toContain(URLS.INVENTORY_PAGE)
         await expect(inventoryPage.cartLink).toBeDisplayed()
     })
     it('The cart page is open, the products added in step 1 are in the cart', async () => {
         await inventoryPage.cartLink.click()
         const currentUrl = await browser.getUrl()
-        await expect(currentUrl).toContain('cart.html')
-        const productInCart = await $('.inventory_item_name').getText()
-            if (productInCart !==savedName) {
-                throw new Error(`Expected ${savedName}, but found ${productInCart}`)
-            }
+        await expect(currentUrl).toContain(URLS.CART_PAGE)
+        await expect(inventoryPage.cartItemName).toHaveText(savedName)
     })
 })
